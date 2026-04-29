@@ -1,0 +1,9 @@
+data_cache/
+results/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+dist/
+.DS_Store
+.worktrees/
