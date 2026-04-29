@@ -1,0 +1,25 @@
+pair:
+  y: "GLD"   # dependent leg
+  x: "IAU"   # independent leg
+
+data:
+  start: "2007-01-01"
+  end:   "2026-04-25"
+  cache_dir: "data_cache"
+
+walk_forward:
+  formation_min_bars: 504   # ~2 trading years
+  trading_bars: 126         # ~6 trading months
+
+kalman:
+  delta: 1.0e-4   # process-noise diffusion — fixed globally, never tuned per window
+  R: 1.0e-3       # observation noise variance
+
+signals:
+  entry_z: 2.0
+  exit_z: 0.5
+
+costs:
+  bps: 5
+
+results_dir: "results"
