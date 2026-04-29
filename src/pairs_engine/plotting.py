@@ -1,0 +1,75 @@
+from __future__ import annotations
+import matplotlib
+matplotlib.use("Agg")  # non-interactive backend — safe for headless/CI
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
+
+def plot_equity(equity: pd.Series, outpath: str) -> None:
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 7), sharex=True,
+                                    gridspec_kw={"height_ratios": [3, 1]})
+    ax1.plot(equity.index, equity.values, color="#2563eb", linewidth=1.2, label="Equity")
+    ax1.set_ylabel("Equity (normalised to 1)")
+    ax1.set_title("Out-of-Sample Equity Curve — GLD/IAU Pairs Strategy")
+    ax1.legend()
+    ax1.grid(True, alpha=0.3)
+
+    peak = equity.cummax()
+    drawdown = (equity - peak) / peak
+    ax2.fill_between(drawdown.index, drawdown.values, 0, color="#dc2626", alpha=0.5)
+    ax2.set_ylabel("Drawdown")
+    ax2.set_xlabel("Date")
+    ax2.grid(True, alpha=0.3)
+
+    fig.tight_layout()
+    fig.savefig(outpath, dpi=150)
+    plt.close(fig)
+
+
+def plot_spread_z(df: pd.DataFrame, outpath: str) -> None:
+    """Two-panel: spread on top, z-score with threshold lines below."""
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 7), sharex=True)
+
+    ax1.plot(df.index, df["spread"], color="#059669", linewidth=0.8)
+    ax1.axhline(0, color="black", linewidth=0.5, linestyle="--")
+    ax1.set_ylabel("Spread (Kalman innovation)")
+    ax1.set_title("Spread and Z-Score — GLD/IAU")
+    ax1.grid(True, alpha=0.3)
+
+    z = df["z"]
+    ax2.plot(df.index, z, color="#7c3aed", linewidth=0.8, label="Z-score")
+    ax2.axhline(2.0, color="#dc2626", linewidth=1.0, linestyle="--", label="Entry ±2.0")
+    ax2.axhline(-2.0, color="#dc2626", linewidth=1.0, linestyle="--")
+    ax2.axhline(0.5, color="#d97706", linewidth=0.8, linestyle=":", label="Exit ±0.5")
+    ax2.axhline(-0.5, color="#d97706", linewidth=0.8, linestyle=":")
+    ax2.axhline(0, color="black", linewidth=0.5, linestyle="--")
+
+    pos = df["position"]
+    for i in range(1, len(df)):
+        if pos.iloc[i] == -1:
+            ax2.axvspan(df.index[i-1], df.index[i], alpha=0.15, color="#dc2626")
+        elif pos.iloc[i] == 1:
+            ax2.axvspan(df.index[i-1], df.index[i], alpha=0.15, color="#059669")
+
+    ax2.set_ylabel("Z-score")
+    ax2.set_xlabel("Date")
+    ax2.legend(fontsize=8)
+    ax2.grid(True, alpha=0.3)
+
+    fig.tight_layout()
+    fig.savefig(outpath, dpi=150)
+    plt.close(fig)
+
+
+def plot_beta(df: pd.DataFrame, outpath: str) -> None:
+    """Kalman beta over time."""
+    fig, ax = plt.subplots(figsize=(12, 4))
+    ax.plot(df.index, df["beta"], color="#2563eb", linewidth=0.9, label="Kalman beta")
+    ax.set_ylabel("Hedge Ratio (beta)")
+    ax.set_title("Dynamic Hedge Ratio — Kalman Filter")
+    ax.legend()
+    ax.grid(True, alpha=0.3)
+    fig.tight_layout()
+    fig.savefig(outpath, dpi=150)
+    plt.close(fig)
