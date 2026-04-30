@@ -7,7 +7,7 @@ import pandas as pd
 from pairs_engine.data import load_or_fetch
 from pairs_engine.backtest import walk_forward
 from pairs_engine.metrics import summary
-from pairs_engine.plotting import plot_equity, plot_spread_z, plot_beta
+from pairs_engine.plotting import plot_equity, plot_spread_z, plot_beta, plot_johansen_stability
 
 
 def main() -> None:
@@ -60,6 +60,12 @@ def main() -> None:
         plot_equity(ec["equity"], str(results_dir / "equity.png"))
         plot_spread_z(ec, str(results_dir / "spread_z.png"))
         plot_beta(ec, str(results_dir / "beta.png"))
+    plot_johansen_stability(
+        log_prices,
+        formation_min=cfg["walk_forward"]["formation_min_bars"],
+        trading_len=cfg["walk_forward"]["trading_bars"],
+        outpath=str(results_dir / "johansen_stability.png"),
+    )
 
     pair_str = f"{tickers[0]}/{tickers[1]}"
     date_range = f"{ec.index[0].date()} → {ec.index[-1].date()}" if len(ec) > 0 else "N/A"

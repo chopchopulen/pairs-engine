@@ -1,6 +1,6 @@
 pair:
-  y: "GLD"   # dependent leg
-  x: "IAU"   # independent leg
+  y: "EWA"   # dependent leg (Australia ETF — commodity-driven economy)
+  x: "EWC"   # independent leg (Canada ETF — commodity-driven economy)
 
 data:
   start: "2007-01-01"
@@ -12,12 +12,12 @@ walk_forward:
   trading_bars: 126         # ~6 trading months
 
 kalman:
-  delta: 1.0e-4   # process-noise diffusion — fixed globally, never tuned per window
+  delta: 1.0e-6   # process-noise diffusion — fixed globally, never tuned per window
   R: 1.0e-3       # observation noise variance
 
 signals:
-  entry_z: 2.0
-  exit_z: 0.5
+  entry_z: 1.0
+  exit_z: 0.3
 
 costs:
   bps: 5

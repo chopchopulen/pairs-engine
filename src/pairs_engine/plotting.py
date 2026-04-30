@@ -73,3 +73,42 @@ def plot_beta(df: pd.DataFrame, outpath: str) -> None:
     fig.tight_layout()
     fig.savefig(outpath, dpi=150)
     plt.close(fig)
+
+
+def plot_johansen_stability(log_prices: pd.DataFrame, formation_min: int, trading_len: int, outpath: str) -> None:
+    """Expanding-window Johansen trace statistic vs 95% critical value."""
+    from pairs_engine.cointegration import johansen_test
+
+    dates = []
+    trace_stats = []
+    crit_95 = None
+
+    for end in range(formation_min, len(log_prices), trading_len):
+        slice_ = log_prices.iloc[:end]
+        try:
+            result = johansen_test(slice_)
+        except ValueError:
+            continue
+        dates.append(log_prices.index[end - 1])
+        trace_stats.append(result["trace_stat"])
+        if crit_95 is None:
+            crit_95 = result["crit_95"]
+
+    if not dates:
+        return
+
+    fig, ax = plt.subplots(figsize=(12, 4))
+    ax.plot(dates, trace_stats, color="#2563eb", linewidth=1.2, label="Johansen trace stat")
+    ax.axhline(crit_95, color="#dc2626", linewidth=1.0, linestyle="--",
+               label=f"95% critical value ({crit_95:.2f})")
+    ax.fill_between(dates, trace_stats, crit_95,
+                    where=[t > crit_95 for t in trace_stats],
+                    alpha=0.15, color="#059669", label="Cointegrated region")
+    ax.set_ylabel("Trace Statistic")
+    ax.set_xlabel("Formation Window End Date")
+    ax.set_title("Johansen Cointegration Stability (Expanding Window)")
+    ax.legend()
+    ax.grid(True, alpha=0.3)
+    fig.tight_layout()
+    fig.savefig(outpath, dpi=150)
+    plt.close(fig)
