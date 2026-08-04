@@ -1,8 +1,30 @@
 # Pairs Trading Engine
 
-A production-quality statistical arbitrage engine built for interview-level scrutiny. Uses Johansen cointegration testing, a Kalman Filter for dynamic hedge-ratio estimation, and walk-forward backtesting with strict no-look-ahead guarantees.
+A statistical arbitrage engine using Johansen cointegration testing, a Kalman Filter for dynamic
+hedge-ratio estimation, and walk-forward backtesting with strict no-look-ahead guarantees.
 
-**Headline result (EWA/EWC, 2011–2025):** Sharpe 0.296 · 72.7% win rate · 33 trades · 24.4% total return · 17.6% max drawdown
+**Headline result (EWA/EWC, 2011–2025):** Sharpe 0.296 · 72.7% win rate · **33 trades** · 24.4%
+total return · 17.6% max drawdown
+
+> ### ⚠️ Read this before quoting any number above
+>
+> **n = 33.** At a 72.7% win rate the binomial test against 50% gives z ≈ 2.6 (p < 0.01) —
+> meaningful, not overwhelming. This is a **proof-of-concept on a single pair**, not a strategy
+> result. See the FAQ.
+>
+> **The pair is not independently selected.** EWA/EWC is the standard worked example in Chan
+> (2013), which this repo also cites for the Kalman filter. The commodity-exporter rationale is
+> real, but the pair arrives pre-selected by the literature — which is itself a form of
+> selection that the 27-of-34 Johansen pass rate does not control for.
+>
+> **This repo has not been through an adversarial audit.** Four sibling projects have
+> ([lob-engine](https://github.com/chopchopulen/lob-engine),
+> [options-mm](https://github.com/chopchopulen/options-mm),
+> [ml-vol-momentum](https://github.com/chopchopulen/ml-vol-momentum), and the RMT covariance
+> work), and each one found defects that invalidated a headline: 21 defects behind a green
+> 70-test suite, a loss function that inverted 10 of 10 Diebold–Mariano verdicts, a `uint32_t`
+> underflow corrupting ~100% of reconstructed rows. **The base rate says this repo has some
+> too.** Until it gets the same treatment, treat every number above as unaudited.
 
 ---
 
